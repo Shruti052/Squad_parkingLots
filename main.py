@@ -1,5 +1,5 @@
 
-def assing_slot(parking_lots=[],vdata={},next_empty=0):
+def assign_slot(parking_lots=[],vdata={},next_empty=0):
     '''assing slot to car & find next empty slot'''
     if next_empty > len(parking_lots):
         print("Parking Slots are FULL")
@@ -23,21 +23,29 @@ def leave_slot(slot_no=0,parking_lots=[],next_empty=0):
     cdata = parking_lots[slot_no-1]
     parking_lots[slot_no-1] = 0
     print(f"Slot number {slot_no} vacated, the car with vehicle registration number {cdata['vno']} left the space, the driver of the car was of age {cdata['age']}")
-    # if smaller slot is found to be empty, update next empty slot variable
+    # if this slot(empty) is found to be smaller, update next_empty variable
     if slot_no < next_empty:
         next_empty = slot_no
     return next_empty
 
 def print_commands(command='',parking_lots=[]):
+    '''reads commands, gets what to find & for what & prints required data'''
+
     find = command.split('for')[0][0:-1].upper()
     where = (command.split('for')[1]).split(' ')[0][1::].upper()
     value = command.split(' ')[1]
+    # dict created for types for commands that could be received 
     sdict = {'VEHICLE_REGISTRATION_NUMBER':'vno','VEHICLE_REGISTRATION_NUMBERS':'vno','CAR_WITH_NUMBER':'vno','CAR_WITH_NUMBERS':'vno','CAR_NUMBER':'vno','CAR_NUMBERS':'vno',
                 'SLOT_NUMBER':'slot_no','SLOT_NUMBERS':'slot_no','SLOT_WITH_NUMBER':'slot_no',
                 'DRIVER_OF_AGE':'age','DRIVER_AGE':'age','DRIVER_WITH_AGE':'age','AGE':'age'
             }
-    find = sdict[find]
-    where = sdict[where]
+    # variables for which we need to find data
+    try:
+        find = sdict[find]
+        where = sdict[where]
+    except:
+        print("Request Not Found :/   ..Please Enter Valid Command")
+        return
     result_list = []
     for slot in parking_lots:
         if slot == 0:
@@ -50,11 +58,10 @@ def print_commands(command='',parking_lots=[]):
 
 def main():
     '''reads input from txt file & runs commands present in txt file'''
-    print("in  main ...")
+
     file_data = open("input.txt","r+")
     parking_lots=[]
     next_empty = 0
-    
     for line in file_data.readlines():
         line = line.strip('\n') 
         commands = line.split(' ')
@@ -63,7 +70,7 @@ def main():
             next_empty = 1
             print(f"Created parking of {int(commands[1])} slots..")
         elif commands[0].upper() == 'PARK':
-            next_empty = assing_slot(parking_lots=parking_lots,vdata={"vno":commands[1],"age":commands[3]},next_empty=next_empty)
+            next_empty = assign_slot(parking_lots=parking_lots,vdata={"vno":commands[1],"age":commands[3]},next_empty=next_empty)
         elif commands[0].upper() == 'LEAVE':
             next_empty = leave_slot(slot_no = int(commands[1]),parking_lots = parking_lots,next_empty=next_empty)
         else:
